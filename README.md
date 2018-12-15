@@ -10,7 +10,7 @@ This needs node, npm and redis installed.
 git clone https://github.com/utkarsh-shekhar/collab-demo.git 
 cd collab-demo
 npm install
-npm start
+npm run build && npm start
 ```
 
 The server should be up and running at http://localhost:8080/
