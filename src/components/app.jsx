@@ -52,7 +52,7 @@ class App extends React.Component {
           this.state.selectedUser && !this.state.selectedBoard &&
             <>
               <span>Create or join board:</span><input ref={this.boardField} />
-            <button onClick={this.selectBoard}> Next </button>
+              <button onClick={this.selectBoard}> Next </button>
             </>
         }
         {

@@ -23,14 +23,11 @@ io.on('connection', function(socketconnection){
   socketconnection.connected_channels = {}
 
   socketconnection.on('message', message => {
-
-
     Object.keys(socketconnection.connected_channels).forEach(channel_name => {
       // store the state in redis
       redisClient.get(channel_name, function(err, response) {
         if(response) {
           response = JSON.parse(response);
-          console.log("=--------message-----", this)
           let lockAcquiredBy = null;
           if(this.type === "lock") {
             lockAcquiredBy = this.lockAcquiredBy;
@@ -42,10 +39,6 @@ io.on('connection', function(socketconnection){
             lastChangedByUser: this.lastChangedByUser || response.lastChangedByUser,
             lockAcquiredBy
           }
-
-          console.log("response got here", response)
-          console.log("data", data)
-          console.log("saving upar channel_name", channel_name);
           redisClient.set(channel_name, JSON.stringify(data));
         }
       }.bind(message));
@@ -65,15 +58,12 @@ io.on('connection', function(socketconnection){
 
       // get the board state from redis
       redisClient.get(channel_name, (err, response) => {
-        console.log("response while sending", response)
         let data = JSON.parse(response);
         data.type = "init";
-        console.log("data there", data)
         if(response) socketconnection.send(data);
       });
     }
     else{
-      console.log("it is a new board")
       //Else, initialize new Redis Client as a channel and make it subscribe to channel_name
       global_channels[channel_name] = redis.createClient();
       global_channels[channel_name].subscribe(channel_name);
@@ -96,7 +86,6 @@ io.on('connection', function(socketconnection){
     }
 
     // store the state in redis
-    console.log("saveingchannel_name", channel_name);
     redisClient.set(channel_name, JSON.stringify(data));
   });
 
