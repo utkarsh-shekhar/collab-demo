@@ -1,5 +1,7 @@
 import React from 'react';
 import io from 'socket.io-client';
+import ReactQuill from 'react-quill';
+import { SIGABRT } from 'constants';
 
 class Board extends React.Component {
   constructor(props) {
@@ -20,22 +22,27 @@ class Board extends React.Component {
 
   onClick() {
     console.log("clicked")
+    if(!this.state.disabled) return;
+
     this.client.emit("message", {
       type: "lock",
       lockAcquiredBy: this.props.user
     });
-    this.textArea.current.focus();
+    // this.textArea.current.focus();
     this.setState({ disabled: false, lockAcquiredBy: this.props.user });
   }
 
-  onContentChange(event) {
-    let text = event.target.value;
+  onContentChange(text) {
+    if(this.state.lockAcquiredBy !== this.props.user) return;
     this.client.emit("message", {
       type: "contentChange",
       lastChangedByUser: this.props.user,
       text
     });
-    this.setState({text})
+    this.setState({
+      lastChangedByUser: "You",
+      text
+    });
   }
 
   onMessage(message) {
@@ -44,7 +51,7 @@ class Board extends React.Component {
       this.setState({... message});
     } if(message.type === "lock" && message.lockAcquiredBy !== this.props.user) {
       this.setState({ disabled: true, lockAcquiredBy: message.lockAcquiredBy });
-    } else if(message.type === "contentChange") {
+    } else if(message.type === "contentChange" && message.lastChangedByUser !== this.props.user) {
       this.setState({
         text: message.text,
         lastChangedByUser: message.lastChangedByUser === this.props.user ? "you" :  message.lastChangedByUser
@@ -76,28 +83,24 @@ class Board extends React.Component {
     return (
       <div>
         <p>Board: {this.props.board} </p>
-        {
-          this.state.lastChangedByUser &&
-            <p>Last changed by: {this.state.lastChangedByUser} </p>
-        }
-        <p>
+        <div style={{height: "25px", width: "100%"}}>
           {this.state.lockAcquiredBy ? 
-            <span>Lock acquired by: {this.state.lockAcquiredBy === this.props.user ? "You" : this.state.lockAcquiredBy}</span>
+            <span style={{float: "left"}}>Lock acquired by: {this.state.lockAcquiredBy === this.props.user ? "You" : this.state.lockAcquiredBy}</span>
             :
-            <span>No one currently working on this. Acquire lock to start.</span>
+            <span style={{float: "left"}}>No one currently working on this. Acquire lock to start.</span>
           }
-        </p>
-        <textarea
-          rows={25}
-          cols={50}
+          {
+            this.state.lastChangedByUser &&
+              <span style={{float: "right"}}>Last changed by: {this.state.lastChangedByUser} </span>
+          }
+        </div>
+        <ReactQuill
           value={this.state.text}
-          disabled={this.state.disabled}
           onChange={this.onContentChange}
-          ref={this.textArea}
-        >
-        </textarea>
+          onFocus={this.onClick}
+          readOnly={this.state.disabled} />
         <p></p>
-        <button disabled={this.state.lockAcquiredBy === this.props.user} onClick={this.onClick}>Get lock</button>
+        <span style={{fontSize: "12px"}}>The board state will be destroyed when there are no more users connected to the board</span>
       </div>
     );
   }
