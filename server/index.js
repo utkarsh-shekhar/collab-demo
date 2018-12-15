@@ -30,10 +30,17 @@ io.on('connection', function(socketconnection){
       redisClient.get(channel_name, function(err, response) {
         if(response) {
           response = JSON.parse(response);
+          console.log("=--------message-----", this)
+          let lockAcquiredBy = null;
+          if(this.type === "lock") {
+            lockAcquiredBy = this.lockAcquiredBy;
+          } else {
+            lockAcquiredBy = response.lockAcquiredBy
+          }
           let data = {
             text: this.text || response.text,
             lastChangedByUser: this.lastChangedByUser || response.lastChangedByUser,
-            lockAcquiredBy: this.lockAcquiredBy || response.lockAcquiredBy
+            lockAcquiredBy
           }
 
           console.log("response got here", response)

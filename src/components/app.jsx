@@ -20,7 +20,7 @@ class App extends React.Component {
 
   selectUser() {
     let user = this.userField.current.value;
-    if(user.trim === "") return;
+    if(user.trim() === "") return;
 
     this.setState({
       user,
@@ -30,7 +30,7 @@ class App extends React.Component {
 
   selectBoard() {
     let board = this.boardField.current.value;
-    if(board.trim === "") return;
+    if(board.trim() === "") return;
 
     this.setState({
       board,
@@ -44,14 +44,14 @@ class App extends React.Component {
         {
           !this.state.selectedUser &&
             <>
-            <span>Enter your username:</span><input ref={this.userField} />
+            <span>Name:</span><input ref={this.userField} />
             <button onClick={this.selectUser}> Next </button>
             </>
         }
         {
           this.state.selectedUser && !this.state.selectedBoard &&
             <>
-              <span>Go to the board:</span><input ref={this.boardField} />
+              <span>Create or join board:</span><input ref={this.boardField} />
             <button onClick={this.selectBoard}> Next </button>
             </>
         }

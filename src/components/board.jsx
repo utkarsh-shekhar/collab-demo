@@ -41,15 +41,13 @@ class Board extends React.Component {
   onMessage(message) {
     console.log(message);
     if(message.type === "init") {
-      if(message.lockAcquiredBy === null) message.disabled = false;
-
       this.setState({... message});
     } if(message.type === "lock" && message.lockAcquiredBy !== this.props.user) {
       this.setState({ disabled: true, lockAcquiredBy: message.lockAcquiredBy });
     } else if(message.type === "contentChange") {
       this.setState({
         text: message.text,
-        lastChangedByUser: message.lastChangedByUser === this.props.user ? "Me" :  message.lastChangedByUser
+        lastChangedByUser: message.lastChangedByUser === this.props.user ? "you" :  message.lastChangedByUser
       })
     }
   }
@@ -59,6 +57,12 @@ class Board extends React.Component {
     this.client = io.connect(serverUrl);
     this.client.emit('subscribe', this.props.board);
     this.client.on("message", this.onMessage);
+    window.addEventListener('unload', function(event) {
+      this.client.emit("message", {
+        type: "lock",
+        lockAcquiredBy: null
+      });
+    }.bind(this));
   }
 
   componentWillUnmount() {
@@ -77,7 +81,11 @@ class Board extends React.Component {
             <p>Last changed by: {this.state.lastChangedByUser} </p>
         }
         <p>
-          {this.state.lockAcquiredBy && <span>Lock Acquired By: {this.state.lockAcquiredBy === this.props.user ? "You" : this.state.lockAcquiredBy}</span>}
+          {this.state.lockAcquiredBy ? 
+            <span>Lock acquired by: {this.state.lockAcquiredBy === this.props.user ? "You" : this.state.lockAcquiredBy}</span>
+            :
+            <span>No one currently working on this. Acquire lock to start.</span>
+          }
         </p>
         <textarea
           rows={25}
