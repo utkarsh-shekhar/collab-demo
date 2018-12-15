@@ -1,7 +1,6 @@
 import React from 'react';
 import io from 'socket.io-client';
 import ReactQuill from 'react-quill';
-import { SIGABRT } from 'constants';
 
 class Board extends React.Component {
   constructor(props) {
