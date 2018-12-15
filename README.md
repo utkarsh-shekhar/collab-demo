@@ -1,6 +1,6 @@
 # collab-demo
 A small demo of how collaboration software can work. 
-Uses mostly the same server code as is given [https://codesachin.wordpress.com/2015/06/27/redis-node-js-socket-io-event-driven-subscription-based-broadcasting/](here).
+Uses mostly the same server code as is given [here](https://codesachin.wordpress.com/2015/06/27/redis-node-js-socket-io-event-driven-subscription-based-broadcasting/).
 
 ## Prerequisites
 This needs node, npm and redis installed.
