@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --mode=development -w"
+    "watch": "webpack --mode=development -w",
+    "start": "node server/index.js"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
